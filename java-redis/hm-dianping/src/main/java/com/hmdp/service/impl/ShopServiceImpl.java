@@ -13,6 +13,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
+import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -39,10 +40,16 @@ public class ShopServiceImpl extends ServiceImpl<ShopMapper, Shop> implements IS
             Shop shop = JSONUtil.toBean(shopJson, Shop.class);
             return Result.ok(shop);
         }
+        //判断是否命中的是空值
+        if (Objects.equals(shopJson, "")) {
+            return Result.fail("店铺不存在");
+        }
 
         //4 不存在，根据id查询数据库
         Shop shop = getById(id);
         if (shop == null) {
+            // 将空值写入redis，解决缓存穿透问题
+            stringRedisTemplate.opsForValue().set(RedisConstants.CACHE_SHOP_KEY + id, "", RedisConstants.CACHE_NULL_TTL, TimeUnit.MINUTES);
             return Result.fail("店铺不存在");
         }
         //5 存在，写入redis
