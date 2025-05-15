@@ -9,6 +9,7 @@ import com.hmdp.service.IVoucherOrderService;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.hmdp.utils.RedisIdWorker;
 import com.hmdp.utils.UserHolder;
+import org.springframework.aop.framework.AopContext;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -32,7 +33,7 @@ public class VoucherOrderServiceImpl extends ServiceImpl<VoucherOrderMapper, Vou
     private RedisIdWorker redisIdWorker;
 
     @Override
-    @Transactional
+//    @Transactional
     public Result seckillVoucher(Long voucherId) {
         //1 查询优惠券
         SeckillVoucher voucher = seckillVoucherService.getById(voucherId);
@@ -44,6 +45,24 @@ public class VoucherOrderServiceImpl extends ServiceImpl<VoucherOrderMapper, Vou
         if (voucher.getEndTime().isBefore(LocalDateTime.now())) {
             return Result.fail("秒杀已经结束");
         }
+        Long userId = UserHolder.getUser().getId();
+        synchronized (userId.toString().intern()) { // 锁对象，应该为唯一，可以使用订单id，加上优惠券id，加上用户id， 使用 intern， 保证字符串常量池只有一个对象
+            IVoucherOrderService proxy = (IVoucherOrderService) AopContext.currentProxy();// 使用代理对象，解决spring事物失效问题
+            return proxy.createVoucherOrder(voucherId, voucher);
+        }
+    }
+
+    @Transactional
+    public Result createVoucherOrder(Long voucherId, SeckillVoucher voucher) {
+        // 一个人只能抢一次
+        // 查询订单
+        Long userId = UserHolder.getUser().getId();
+        Long count = query().eq("user_id", userId).eq("voucher_id", voucherId).count();
+        // 判断是否存在
+        if (count > 0) {
+            return Result.fail("您已经抢过该优惠券了");
+        }
+
         //4 优惠券库存是否充足
         if (voucher.getStock() < 1) {
             return Result.fail("库存不足");
@@ -61,7 +80,6 @@ public class VoucherOrderServiceImpl extends ServiceImpl<VoucherOrderMapper, Vou
         //7 生成订单id
         long orderId = redisIdWorker.nextId("order");
         voucherOrder.setId(orderId);
-        Long userId = UserHolder.getUser().getId();
         voucherOrder.setUserId(userId);
         voucherOrder.setVoucherId(voucherId);
         //7 保存订单
