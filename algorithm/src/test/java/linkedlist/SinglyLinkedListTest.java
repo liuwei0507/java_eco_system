@@ -23,6 +23,7 @@ class SinglyLinkedListTest {
         for (Integer value : list) {
             System.out.println(value);
         }
+        list.loop3();
     }
 
     @Test
