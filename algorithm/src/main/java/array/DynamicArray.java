@@ -8,20 +8,48 @@ import java.util.stream.IntStream;
 public class DynamicArray implements Iterable<Integer> {
     private int size = 0; // 逻辑大小
     private int capacity = 8;// 容量
-    private int[] array = new int[capacity]; // 初始化容器
+    private int[] array = {}; // 初始化容器
 
+    /**
+     * 向最后添加元素
+     *
+     * @param element 待添加元素
+     */
     public void addLast(int element) {
 //        array[size] = element;
 //        size++;
         add(size, element);
     }
 
+    /**
+     * 【0..size】添加元素
+     *
+     * @param index   索引位置
+     * @param element 待添加元素
+     */
     public void add(int index, int element) {
+        //容量检查
+        checkAndGrow();
+        //添加逻辑
         if (index >= 0 && index < size) {
+            //往后移动，空出待插入位置
             System.arraycopy(array, index, array, index + 1, size - index);
         }
         array[size] = element;
         size++;
+    }
+
+    private void checkAndGrow() {
+        if (size == 0) {
+            array = new int[capacity];
+        } else if (size == capacity) {
+            // 进行扩容 1.5倍 1.618倍 2倍
+            capacity += capacity >> 1;
+            int[] newArray = new int[capacity];
+            // 旧数组复制到新数组
+            System.arraycopy(array, 0, newArray, 0, size);
+            array = newArray;
+        }
     }
 
 
