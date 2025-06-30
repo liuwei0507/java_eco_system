@@ -58,6 +58,11 @@ public class A102_TreeLevelOrder {
                         new TreeNode(7)
                 )
         );
+        new A102_TreeLevelOrder().levelOrder(root);
+//        base_tree_level_order(root);
+    }
+
+    private static void base_tree_level_order(TreeNode root) {
         LinkedListQueue<TreeNode> queue = new LinkedListQueue<>();
         queue.offer(root);
         int c1 = 1;// 当前层节点数
