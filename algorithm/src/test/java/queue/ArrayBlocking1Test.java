@@ -27,4 +27,28 @@ class ArrayBlocking1Test {
         assertFalse(queue.offer(6, 2000));
     }
 
+    @Test
+    public void offer_poll() throws InterruptedException {
+        ArrayBlocking1<Integer> queue = new ArrayBlocking1<>(5);
+
+        Thread t1 = new Thread(() -> {
+            try {
+                queue.offer(1);
+            } catch (InterruptedException e) {
+                throw new RuntimeException(e);
+            }
+
+        });
+        t1.start();
+        Thread t2 = new Thread(() -> {
+            try {
+                queue.poll();
+            } catch (InterruptedException e) {
+                throw new RuntimeException(e);
+            }
+
+        });
+        t2.start();
+    }
+
 }
