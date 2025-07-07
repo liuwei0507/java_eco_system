@@ -3,19 +3,19 @@ package heap;
 import java.util.Arrays;
 
 /**
- * 大顶堆
+ * 小顶堆
  * <p>
  * 建堆
  */
-public class MaxHeap {
+public class MinHeap {
     int[] array;
     int size;
 
-    public MaxHeap(int capacity) {
+    public MinHeap(int capacity) {
         array = new int[capacity];
     }
 
-    public MaxHeap(int[] array) {
+    public MinHeap(int[] array) {
         this.array = array;
         this.size = array.length;
         heapify();
@@ -86,7 +86,7 @@ public class MaxHeap {
     }
 
     /**
-     * 将offer元素上浮，直至offered小于父元素或到堆顶
+     * 将offer元素上浮，直至offered大于父元素或到堆顶
      *
      * @param offered
      */
@@ -94,7 +94,7 @@ public class MaxHeap {
         int child = size;
         while (child > 0) {
             int parent = (child - 1) / 2;
-            if (offered > array[parent]) {
+            if (offered < array[parent]) {
                 array[child] = array[parent];
             } else {
                 break;
@@ -113,18 +113,18 @@ public class MaxHeap {
         }
     }
 
-    // 将parent索引出的元素下潜：与两个孩子较大者交换，直至没孩子或孩子没他大
+    // 将parent索引出的元素下潜：与两个孩子较小者交换，直至没孩子或孩子没他小
     public void down(int parent) {
         int leftChild = parent * 2 + 1;
         int rightChild = leftChild + 1;
         int max = parent;
-        if (leftChild < size && array[leftChild] > array[max]) {
+        if (leftChild < size && array[leftChild] < array[max]) {
             max = leftChild;
         }
-        if (rightChild < size && array[rightChild] > array[max]) {
+        if (rightChild < size && array[rightChild] < array[max]) {
             max = rightChild;
         }
-        if (max != parent) { // 找到了更大的孩子
+        if (max != parent) { // 找到了更小的孩子
             swap(parent, max);
             down(max);
         }
@@ -136,9 +136,13 @@ public class MaxHeap {
         array[j] = temp;
     }
 
+    public boolean isFull() {
+        return size == array.length;
+    }
+
     public static void main(String[] args) {
         int[] array = {1, 2, 3, 4, 5, 6, 7};
-        MaxHeap maxHeap = new MaxHeap(array);
+        MinHeap maxHeap = new MinHeap(array);
         System.out.println(Arrays.toString(maxHeap.array));
     }
 }
