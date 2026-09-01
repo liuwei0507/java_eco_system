@@ -1,15 +1,30 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>JS-函数</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JS-函数</title>
 </head>
 <body>
-  
 
-  <script>
-   
-  </script>
+
+<script>
+    // 1. 自定义对象
+    let user = {
+        name: 'Tome',
+        age: 18,
+        gender: '男',
+        sing: function () {
+            alert(this.name + '唱歌')
+        },
+        sing_2: () => { // 注意： 箭头函数中，this并不指向当前对象，指向当前对象的父对象
+            alert(this.name + '唱歌')
+        }
+    }
+
+    alert(user.name)
+    user.sing()
+    user.sing_2()
+</script>
 </body>
 </html>
